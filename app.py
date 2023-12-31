@@ -56,7 +56,12 @@ def process_file(file, api_key, cse_id, country_code, language_code):
 
 # Streamlit app layout
 def main():
-    st.title("Spreadsheet Processor")
+    st.title("Answer SERP Scraper")
+
+    st.markdown("""
+    ## About the App
+    *Answer SERP Scraper* is an application designed to assist in digital marketing and SEO analysis. Created by [jonathanboshoff.com](http://jonathanboshoff.com), this tool uses an Answer Socrates CSV file to extract valuable search engine result page (SERP) data. Specifically, it grabs the top 3 title tags and the bold text from the search results for each query in the file. This information is essential for understanding how content is displayed and highlighted in search engines, providing insights for SEO optimization and content strategy.
+    """)
 
     # Define a list of countries and their codes
     countries = {
