@@ -23,7 +23,7 @@ def extract_bold_text_from_snippets(html_snippets):
         soup = BeautifulSoup(snippet, 'html.parser')
         for bold_tag in soup.find_all(['b', 'strong']):
             bold_texts.append(bold_tag.get_text())
-    return ' '.join(bold_texts)
+    return ', '.join(bold_texts)
 
 # Function to process the file and add new columns with search result titles and bold text
 def process_file(file, api_key, cse_id):
