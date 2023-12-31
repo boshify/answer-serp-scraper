@@ -24,11 +24,24 @@ def process_file(file, api_key, cse_id):
     df['SERP Title 2'] = ''
     df['SERP Title 3'] = ''
 
-    # Check if the column with search queries exists
-    # Replace 'YourSearchQueryColumnName' with the actual name of the column that contains search queries
-    if 'YourSearchQueryColumnName' not in df.columns:
-        st.error("Search query column not found in the uploaded file.")
+    # Check if the file has headers and the third column is present
+    if df.shape[1] < 3:
+        st.error("The uploaded file does not have a Column 'C'.")
         return df
+
+    # Use the third column for search queries
+    for index, row in df.iterrows():
+        # Assuming the third column is the search query column
+        query = row[df.columns[2]]  # df.columns[2] references the third column
+        results = search(query, api_key, cse_id)
+
+        # Extract and assign the titles of the top 3 search results
+        for i in range(3):
+            if results.get('items') and len(results['items']) > i:
+                df.at[index, f'SERP Title {i+1}'] = results['items'][i].get('title', '')
+
+    return df
+
 
     # Iterate over each row and perform search
     for index, row in df.iterrows():
