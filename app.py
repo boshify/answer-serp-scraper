@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import requests
 import json
+from bs4 import BeautifulSoup
 
 # Function to perform a search using the Google Custom Search API
 def search(query, api_key, cse_id, **kwargs):
@@ -15,14 +16,24 @@ def search(query, api_key, cse_id, **kwargs):
     response = requests.get(url, params=params)
     return json.loads(response.text)
 
-# Function to process the file and add new columns with search result titles
+# Function to extract bold text from HTML snippets
+def extract_bold_text(html_snippets):
+    bold_texts = []
+    for snippet in html_snippets:
+        soup = BeautifulSoup(snippet, 'html.parser')
+        for bold_tag in soup.find_all(['b', 'strong']):
+            bold_texts.append(bold_tag.get_text())
+    return ' '.join(bold_texts)
+
+# Function to process the file and add new columns with search result titles and bold text
 def process_file(file, api_key, cse_id):
     df = pd.read_csv(file)
 
-    # Add new columns for search result titles
+    # Add new columns for search result titles and bold text
     df['SERP Title 1'] = ''
     df['SERP Title 2'] = ''
     df['SERP Title 3'] = ''
+    df['Bold Text'] = ''
 
     # Check if the file has headers and the third column is present
     if df.shape[1] < 3:
@@ -31,27 +42,17 @@ def process_file(file, api_key, cse_id):
 
     # Use the third column for search queries
     for index, row in df.iterrows():
-        # Assuming the third column is the search query column
         query = row[df.columns[2]]  # df.columns[2] references the third column
         results = search(query, api_key, cse_id)
+        html_snippets = [item.get('htmlSnippet', '') for item in results.get('items', [])]
 
         # Extract and assign the titles of the top 3 search results
         for i in range(3):
-            if results.get('items') and len(results['items']) > i:
+            if len(results.get('items', [])) > i:
                 df.at[index, f'SERP Title {i+1}'] = results['items'][i].get('title', '')
 
-    return df
-
-
-    # Iterate over each row and perform search
-    for index, row in df.iterrows():
-        query = row['YourSearchQueryColumnName']  # Replace with the actual column name
-        results = search(query, api_key, cse_id)
-
-        # Extract and assign the titles of the top 3 search results
-        for i in range(3):
-            if results.get('items') and len(results['items']) > i:
-                df.at[index, f'SERP Title {i+1}'] = results['items'][i].get('title', '')
+        # Extract and assign the bold text
+        df.at[index, 'Bold Text'] = extract_bold_text(html_snippets)
 
     return df
 
