@@ -12,12 +12,12 @@ def search(query, api_key, cse_id, country_code, language_code, **kwargs):
         'key': api_key,
         'cx': cse_id,
         'gl': country_code,  # Geolocation parameter
-        'lr': language_code,  # Language restrict parameter
+        'lr': language_code  # Language parameter
     }
     params.update(kwargs)
     response = requests.get(url, params=params)
     return json.loads(response.text)
-    
+
 # Function to extract bold text from HTML snippets
 def extract_bold_text_from_snippets(html_snippets):
     bold_texts = []
@@ -31,7 +31,7 @@ def extract_bold_text_from_snippets(html_snippets):
     return ', '.join(bold_texts)
 
 # Function to process the file and add new columns with search result titles and bold text
-def process_file(file, api_key, cse_id, country_code):
+def process_file(file, api_key, cse_id, country_code, language_code):
     df = pd.read_csv(file)
 
     # Add new columns for search result titles and bold text
@@ -42,7 +42,7 @@ def process_file(file, api_key, cse_id, country_code):
 
     for index, row in df.iterrows():
         query = row[df.columns[2]]
-        results = search(query, api_key, cse_id, country_code)
+        results = search(query, api_key, cse_id, country_code, language_code)
 
         # Extract SERP titles and bold text
         if 'items' in results:
@@ -64,7 +64,7 @@ def main():
         "United Kingdom": "GB",
         "Canada": "CA",
         "Australia": "AU",
-        "India": "IN",
+        "India": "IN"
         # Add more countries and their codes here
     }
 
@@ -74,7 +74,7 @@ def main():
         "Spanish": "lang_es",
         "French": "lang_fr",
         "German": "lang_de",
-        "Chinese": "lang_zh",
+        "Chinese": "lang_zh"
         # Add more languages and their codes here
     }
 
@@ -85,7 +85,7 @@ def main():
     selected_language = st.selectbox("Select a language for search", list(languages.keys()), index=0)
 
     # Use Streamlit secrets for API key and CSE ID
-    api_key = st.secrets["GO 2"]
+    api_key = st.secrets["GOOGLE_API_KEY"]
     cse_id = st.secrets["CUSTOM_SEARCH_ENGINE_ID"]
 
     uploaded_file = st.file_uploader("Upload your file", type=["csv"])
