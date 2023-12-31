@@ -19,19 +19,20 @@ def search(query, api_key, cse_id, **kwargs):
 def process_file(file, api_key, cse_id):
     df = pd.read_csv(file)
 
-    # Check if column 'C' exists
-    if 'C' not in df.columns:
-        st.error("Column 'C' not found in the uploaded file.")
-        return df
-
     # Add new columns for search result titles
     df['SERP Title 1'] = ''
     df['SERP Title 2'] = ''
     df['SERP Title 3'] = ''
 
+    # Check if the column with search queries exists
+    # Replace 'YourSearchQueryColumnName' with the actual name of the column that contains search queries
+    if 'YourSearchQueryColumnName' not in df.columns:
+        st.error("Search query column not found in the uploaded file.")
+        return df
+
     # Iterate over each row and perform search
     for index, row in df.iterrows():
-        query = row['C']  # Using the search queries from column C
+        query = row['YourSearchQueryColumnName']  # Replace with the actual column name
         results = search(query, api_key, cse_id)
 
         # Extract and assign the titles of the top 3 search results
