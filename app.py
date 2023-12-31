@@ -3,6 +3,15 @@ import pandas as pd
 import requests
 import json
 
+# Function to read secrets from the secrets.txt file
+def read_secrets():
+    secrets = {}
+    with open("secrets.txt", "r") as file:
+        for line in file:
+            key, value = line.strip().split('=', 1)
+            secrets[key] = value
+    return secrets
+
 # Function to perform a search using the Google Custom Search API
 def search(query, api_key, cse_id, **kwargs):
     url = "https://www.googleapis.com/customsearch/v1"
@@ -39,8 +48,11 @@ def process_file(file, api_key, cse_id):
 # Streamlit app layout
 def main():
     st.title("Spreadsheet Processor")
-    api_key = st.text_input("Enter your Google API Key")
-    cse_id = st.text_input("Enter your Custom Search Engine ID")
+
+    # Read API key and CSE ID from secrets.txt
+    secrets = read_secrets()
+    api_key = secrets.get('GOOGLE_API_KEY')
+    cse_id = secrets.get('CUSTOM_SEARCH_ENGINE_ID')
 
     uploaded_file = st.file_uploader("Upload your file", type=["csv"])
 
