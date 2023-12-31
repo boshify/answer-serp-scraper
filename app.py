@@ -5,12 +5,13 @@ import json
 from bs4 import BeautifulSoup
 
 # Function to perform a search using the Google Custom Search API
-def search(query, api_key, cse_id, **kwargs):
+def search(query, api_key, cse_id, country_code, **kwargs):
     url = "https://www.googleapis.com/customsearch/v1"
     params = {
         'q': query,
         'key': api_key,
         'cx': cse_id,
+        'gl': country_code,  # Geolocation parameter
     }
     params.update(kwargs)
     response = requests.get(url, params=params)
@@ -56,6 +57,19 @@ def process_file(file, api_key, cse_id):
 def main():
     st.title("Spreadsheet Processor")
 
+    # Define a list of countries and their codes
+    countries = {
+        "United States": "US",
+        "United Kingdom": "GB",
+        "Canada": "CA",
+        "Australia": "AU",
+        "India": "IN",
+        # Add more countries and their codes here
+    }
+
+    # Dropdown for selecting a country
+    selected_country = st.selectbox("Select a country for search", list(countries.keys()))
+
     # Use Streamlit secrets for API key and CSE ID
     api_key = st.secrets["GOOGLE_API_KEY"]
     cse_id = st.secrets["CUSTOM_SEARCH_ENGINE_ID"]
@@ -63,7 +77,7 @@ def main():
     uploaded_file = st.file_uploader("Upload your file", type=["csv"])
 
     if uploaded_file is not None and api_key and cse_id:
-        processed_data = process_file(uploaded_file, api_key, cse_id)
+        processed_data = process_file(uploaded_file, api_key, cse_id, countries[selected_country])
 
         st.write("Processed Data:")
         st.write(processed_data)
