@@ -19,6 +19,11 @@ def search(query, api_key, cse_id, **kwargs):
 def process_file(file, api_key, cse_id):
     df = pd.read_csv(file)
 
+    # Check if column 'C' exists
+    if 'C' not in df.columns:
+        st.error("Column 'C' not found in the uploaded file.")
+        return df
+
     # Add new columns for search result titles
     df['SERP Title 1'] = ''
     df['SERP Title 2'] = ''
