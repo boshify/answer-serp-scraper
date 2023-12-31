@@ -30,7 +30,7 @@ def extract_bold_text_from_snippets(html_snippets):
     return ', '.join(bold_texts)
 
 # Function to process the file and add new columns with search result titles and bold text
-def process_file(file, api_key, cse_id):
+def process_file(file, api_key, cse_id, country_code):
     df = pd.read_csv(file)
 
     # Add new columns for search result titles and bold text
@@ -41,7 +41,7 @@ def process_file(file, api_key, cse_id):
 
     for index, row in df.iterrows():
         query = row[df.columns[2]]
-        results = search(query, api_key, cse_id)
+        results = search(query, api_key, cse_id, country_code)
 
         # Extract SERP titles and bold text
         if 'items' in results:
