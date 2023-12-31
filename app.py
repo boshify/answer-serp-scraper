@@ -17,7 +17,7 @@ def search(query, api_key, cse_id, **kwargs):
     return json.loads(response.text)
 
 # Function to extract bold text from HTML snippets
-def extract_bold_text(html_snippets):
+def extract_bold_text_from_snippets(html_snippets):
     bold_texts = []
     for snippet in html_snippets:
         soup = BeautifulSoup(snippet, 'html.parser')
@@ -35,27 +35,17 @@ def process_file(file, api_key, cse_id):
     df['SERP Title 3'] = ''
     df['Bold Text'] = ''
 
-    # Check if the file has headers and the third column is present
-    if df.shape[1] < 3:
-        st.error("The uploaded file does not have a Column 'C'.")
-        return df
-
-    # Use the third column for search queries
     for index, row in df.iterrows():
-        query = row[df.columns[2]]  # df.columns[2] references the third column
-        st.write(f"Processing query: {query}")  # Debugging statement
+        query = row[df.columns[2]]
         results = search(query, api_key, cse_id)
-        st.write(f"API response: {results}")  # Debugging statement
 
+        # Extract SERP titles and bold text
         if 'items' in results:
-            for i in range(3):
-                if len(results['items']) > i:
-                    df.at[index, f'SERP Title {i+1}'] = results['items'][i].get('title', '')
+            for i in range(min(3, len(results['items']))):
+                df.at[index, f'SERP Title {i+1}'] = results['items'][i].get('title', '')
 
-            html_snippets = [item.get('htmlSnippet', '') for item in results.get('items', [])]
-            df.at[index, 'Bold Text'] = extract_bold_text(html_snippets)
-        else:
-            st.error(f"No search results for query: {query}")
+            html_snippets = [item.get('htmlSnippet', '') for item in results['items']]
+            df.at[index, 'Bold Text'] = extract_bold_text_from_snippets(html_snippets)
 
     return df
 
