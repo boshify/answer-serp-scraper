@@ -9,9 +9,9 @@ import re
 # Set Streamlit page configuration
 st.set_page_config(page_title="Answer Socrates Helper", page_icon="🔍", layout="wide")
 
-# Fetch API key and CSE ID from environment variables or hardcoded values
-api_key = os.environ.get("GOOGLE_API_KEY", "YOUR_API_KEY_HERE")
-cse_id = os.environ.get("CUSTOM_SEARCH_ENGINE_ID", "YOUR_CSE_ID_HERE")
+# Fetch API key and CSE ID from Streamlit secrets
+api_key = st.secrets["GOOGLE_API_KEY"]
+cse_id = st.secrets["CUSTOM_SEARCH_ENGINE_ID"]
 
 def google_search(query, api_key, cse_id, num=3):
     url = "https://www.googleapis.com/customsearch/v1"
